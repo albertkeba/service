@@ -6,15 +6,16 @@
  */
 class PdoConnector
 {
-	private static $PDOInstance;
+	private $PDOInstance;
+	private static $instance;
 
 	private function __construct( $dsn, $username, $password )
 	{
-		return new PDO( $dsn, $username, $password );
+		$this->PDOInstance = new PDO( $dsn, $username, $password );
 	}
 
 	/**
-	 * [getInstance description]
+	 * crée et retourne l'objet PdoConnector
 	 * @param  string $dsn
 	 * @param  string $username
 	 * @param  string $password
@@ -22,12 +23,11 @@ class PdoConnector
 	 */
 	public static function getInstance( $dsn, $username, $password )
 	{
-		if ( ! isset(self::$PDOInstance) )
+		if ( ! isset(self::$instance) )
 		{
 			try
 			{
-				self::$PDOInstance = new PdoConnector( $dsn, $username, $password );
-				return self::$PDOInstance;
+				self::$instance = new PdoConnector( $dsn, $username, $password );
 			}
 			catch( PDOException $e )
 			{
@@ -35,86 +35,144 @@ class PdoConnector
 			}
 		}
 
-		return self::$PDOInstance;
+		return self::$instance;
 	}
+	//-- eo getInstance
 
+	/**
+	 * Démarre une transaction
+	 * référence: http://php.net/manual/fr/pdo.begintransaction.php
+	 * @return bool
+	 */
 	public function beginTransaction()
 	{
-		return self::$PDOInstance->beginTransaction();
+		return $this->PDOInstance->beginTransaction();
 	}
 	//-- eo beginTransaction
 
+	/**
+	 * valide une transaction
+	 * référence: http://php.net/manual/fr/pdo.commit.php
+	 * @return bool
+	 */
 	public function commit()
 	{
-		return self::$PDOInstance->commit();
+		return $this->PDOInstance->commit();
 	}
 	//-- eo commit
 
+	/**
+	 *  Retourne le SQLSTATE associé avec la dernière opération
+	 *  référence: http://php.net/manual/fr/pdo.errorcode.php
+	 * @return SQLSTATE
+	 */
 	public function errorCode()
 	{
-		return self::$PDOInstance->errorCode();
+		return $this->PDOInstance->errorCode();
 	}
 	//-- eo errorCode
 
 	/**
-	 * [errorInfo description]
+	 * retourne les infos associées à l'erreur
+	 * référence: http://php.net/manual/fr/pdo.errorinfo.php
 	 * @return [type]
 	 */
 	public function errorInfo()
 	{
-		return self::$PDOInstance->errorInfo();
+		return $this->PDOInstance->errorInfo();
 	}
 	//-- eo errorInfo
 
 	/**
-	 * [exec description]
-	 * @param  [type] $statement
-	 * @return [type]
+	 * Exécute une requête SQL et retourne le nombre de lignes affectées
+	 * référence: http://php.net/manual/fr/pdo.exec.php
+	 * @param  string $statement
+	 * @return int
 	 */
-	public function exec( $statement ) 
+	public function exec( $statement )
 	{
-		return self::$PDOInstance->exec( $statement );
+		return $this->PDOInstance->exec( $statement );
 	}
 	//-- eo exec
 
 	/**
-	 * [getAttribute description]
-	 * @param  [type] $attribute
-	 * @return [type]
+	 * Récupère un attribut d'une connexion à une base de données
+	 * référence: http://php.net/manual/fr/pdo.getattribute.php
+	 * @param  string $attribute
+	 * @return NULL || PDO value
 	 */
 	public function getAttribute( $attribute )
 	{
-		return self::$PDOInstance->getAttribute( $attribute );
+		return $this->PDOInstance->getAttribute( $attribute );
 	}
 	//-- eo getAttribute
 
+	/**
+	 * Vérifie si nous sommes dans une transaction
+	 * référence: http://php.net/manual/fr/pdo.intransaction.php
+	 * @return bool
+	 */
+	public function inTransaction()
+	{
+		return $this->PDOInstance->inTransaction();
+	}
+	//-- eo inTransaction
+
+	/**
+	 * Retourne l'identifiant de la dernière ligne insérée
+	 * référence: http://php.net/manual/fr/pdo.lastinsertid.php
+	 * @param  string $name
+	 * @return string || SQLSTATE
+	 */
 	public function lastInsertId( $name )
 	{
-		return self::$PDOInstance->lastInsertId( $name );
+		return $this->PDOInstance->lastInsertId( $name );
 	}
 	//-- eo lastInsertId
 
+	/**
+	 * Prépare une requête à l'exécution
+	 * référence: http://php.net/manual/fr/pdo.prepare.php
+	 * @param  string $statement
+	 * @return object
+	 */
 	public function prepare( $statement )
 	{
-		return self::$PDOInstance->prepare( $statement );
+		return $this->PDOInstance->prepare( $statement );
 	}
 	//-- eo prepare
 
+	/**
+	 * Récupère la ligne suivante d'un jeu de résultats PDO
+	 * référence: http://php.net/manual/fr/pdostatement.fetch.php
+	 * @return array
+	 */
+	public function fetch( $statement )
+	{
+		return $this->PDOInstance->query( $statement )->fetch( PDO::FETCH_ASSOC );
+	}
+	//-- eo fetch
+
+	/**
+	 * Retourne un tableau contenant toutes les lignes du jeu d'enregistrements
+	 * référence: http://php.net/manual/fr/pdostatement.fetchall.php
+	 * @param  string $statement
+	 * @return array
+	 */
+	public function fetchAll( $statement )
+	{
+		return $this->PDOInstance->query( $statement )->fetchAll( PDO::FETCH_ASSOC );
+	}
+	//-- eo fetchAll
+
+	/**
+	 * Exécute une requête SQL
+	 * @param  [type] $statement
+	 * @return PDOStatement object
+	 */
 	public function query( $statement )
 	{
-		return self::$PDOInstance->query( $statement );
+		return $this->PDOInstance->query( $statement )->fetch();
 	}
 	//-- eo query
-
-	public function queryFetchAllAssoc( $statement )
-	{
-		return self::$PDOInstance->query( $statement )->fetchAll( PDO::FETCH_ASSOC );
-	}
-	//-- eo queryFetchAllAssoc
-
-	public function queryFetchRowAssoc( $statement )
-	{
-		return self::$PDOInstance->query( $statement )->fetch( PDO::FETCH_ASSOC );
-	}
-	//-- eo queryFetchRowAssoc
 }
