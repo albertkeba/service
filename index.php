@@ -6,13 +6,14 @@ require 'Slim/Slim.php';
 
 $app 	= new \Slim\Slim();
 
-$dsn	= 'mysql:host=localhost;dbname=annuaire';
+$dsn	= 'mysql:host=localhost;dbname=directory';
 $username= 'root';
-$password= '';
+$password= 'root';
 $bdCon 	= PdoConnector::getInstance( $dsn, $username, $password );
 
-$app->get('/test', function(){
-	var_dump($bdCon);
+$app->get('/test', function() use( $bdCon ) {
+	var_dump($bdCon->query("select * from directory"));
+	var_dump($bdCon->errorInfo());
 });
 
 

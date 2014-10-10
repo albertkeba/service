@@ -6,12 +6,11 @@
  */
 class PdoConnector
 {
-	private $dbc;
 	private static $PDOInstance;
 
 	private function __construct( $dsn, $username, $password )
 	{
-		$this->dbhc = new PDO( $dsn, $username, $password );
+		return new PDO( $dsn, $username, $password );
 	}
 
 	/**
@@ -28,6 +27,7 @@ class PdoConnector
 			try
 			{
 				self::$PDOInstance = new PdoConnector( $dsn, $username, $password );
+				return self::$PDOInstance;
 			}
 			catch( PDOException $e )
 			{
