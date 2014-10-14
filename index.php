@@ -48,4 +48,8 @@ $app->get('/contacts', function() use( $bdCon ) {
 	echo json_encode( $bdCon->fetchAll("SELECT * FROM employee") );
 });
 
+$app->post('/addContact', function() use( $app, $bdCon ) {
+	$contact = $app->request()->post();
+});
+
 $app->run();
