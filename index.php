@@ -48,8 +48,27 @@ $app->get('/contacts', function() use( $bdCon ) {
 	echo json_encode( $bdCon->fetchAll("SELECT * FROM employee") );
 });
 
+/**
+ * ajout d'un contact
+ */
 $app->post('/addContact', function() use( $app, $bdCon ) {
-	$contact = $app->request()->post();
+	$contact = json_decode( $app->request()->getBody() );
+
+	$lastname = $contact->lastname;
+	$firstname= $contact->firstname;
+
+	try 
+	{
+		$bdCon->beginTransaction();
+		$bdCon->exec("INSERT INTO employee (firstName, lastName) VALUES ('$firstname', '$lastname')");
+		$bdCon->commit();
+	} 
+	catch (Exception $e) 
+	{
+		echo $e->getMessage();
+	}
+	
+	
 });
 
 $app->run();
