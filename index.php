@@ -60,12 +60,19 @@ $app->post('/addContact', function() use( $app, $bdCon ) {
 	try 
 	{
 		$bdCon->beginTransaction();
-		$bdCon->exec("INSERT INTO employee (firstName, lastName) VALUES ('$firstname', '$lastname')");
+		$sth = $bdCon->prepare("INSERT INTO employee (firstName, lastName) VALUES (:firstname, :lastname)");
+		$sth->bindParam(':firstname', $firstname, PDO::PARAM_STR);
+		$sth->bindParam(':lastname', $lastname, PDO::PARAM_STR);
+		$sth->execute();
+		$employeeId = $bdCon->lastInsertId('employee');
 		$bdCon->commit();
+
+		echo json_encode( array('success'=>1, 'id'=>$employeeId) );
 	} 
 	catch (Exception $e) 
 	{
-		echo $e->getMessage();
+		echo json_encode(array('success'=>0, 'message'=>$bdCon->errorInfo(), 'codeError'=>$bdCon->errorCode() ));
+		$bdCon->rollBack();
 	}
 	
 	

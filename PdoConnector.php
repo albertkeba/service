@@ -51,6 +51,17 @@ class PdoConnector
 	//-- eo beginTransaction
 
 	/**
+	 * Annule une transaction
+	 * référence: http://php.net/manual/fr/pdo.rollback.php
+	 * @return bool
+	 */
+	public function rollBack()
+	{
+		return $this->PDOInstance->rollBack();
+	}
+	//-- eo rollBack
+
+	/**
 	 * valide une transaction
 	 * référence: http://php.net/manual/fr/pdo.commit.php
 	 * @return bool
@@ -141,6 +152,31 @@ class PdoConnector
 		return $this->PDOInstance->prepare( $statement );
 	}
 	//-- eo prepare
+
+	/**
+	 * Lie un paramètre à un nom de variable spécifique
+	 * référence: http://php.net/manual/fr/pdostatement.bindparam.php
+	 * @param  string $mask
+	 * @param  string $param
+	 * @param  PDO type $type
+	 * @return bool
+	 */
+	public function bindParam( $mask, $param, $type )
+	{
+		return $this->PDOInstance->bindParam( $mask, $param, $type );
+	}
+	//-- eo bindParam
+
+	/**
+	 * Exécute une requête préparée
+	 * référence: http://php.net/manual/fr/pdostatement.execute.php
+	 * @return bool
+	 */
+	public function execute()
+	{
+		return $this->PDOInstance->execute();
+	}
+	//-- eo execute
 
 	/**
 	 * Récupère la ligne suivante d'un jeu de résultats PDO
